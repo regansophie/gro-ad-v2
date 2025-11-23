@@ -1372,10 +1372,10 @@ timeline.push(makeGumballPages(configs_s3)); // group 1
 
 
 timeline.push(makeGumballPages(pre_prediction_configs));
-timeline.push(makePredictionTrials(speaker_5)); //group 2
+//timeline.push(makePredictionTrials(speaker_5)); //group 2
 
 //Uncomment for group 1 in the prediction phase
-//timeline.push(makePredictionTrials(speaker_6)); //group 2
+timeline.push(makePredictionTrials(speaker_6)); //group 2
 
 timeline.push(saving_screen);
 timeline.push(save_data);
