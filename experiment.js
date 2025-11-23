@@ -1267,7 +1267,7 @@ var prolific_id_page = {
     {
       prompt: `
         <div style="font-size:22px; text-align:center; margin-bottom:20px;">
-          Please enter your Prolific ID to receive credit.
+          Please enter your Prolific ID.
         </div>
       `,
       placeholder: "Enter your Prolific ID here",
@@ -1304,7 +1304,7 @@ var prolific_completion_page = {
       </p>
 
       <p style="margin-top: 10px; font-size: 32px; font-weight: bold;">
-        <code>XXXXXXX</code>
+        <code>C2UKW0TN</code>
       </p>
 
       <p style="margin-top: 30px;">
@@ -1355,7 +1355,8 @@ const timeline = [];
 //Uncomment line below for RPP
 //timeline.push(opening_instructions);
 
-//Uncomment line below for prolific 
+//Uncomment lines below for prolific 
+timeline.push(prolific_id_page);
 timeline.push(opening_instructions_prolific);
 
 timeline.push(consent_block);
@@ -1375,8 +1376,6 @@ timeline.push(makePredictionTrials(speaker_5)); //group 2
 
 //Uncomment for group 1 in the prediction phase
 //timeline.push(makePredictionTrials(speaker_6)); //group 2
-
-timeline.push(prolific_id_page);
 
 timeline.push(saving_screen);
 timeline.push(save_data);
