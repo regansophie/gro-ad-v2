@@ -1316,7 +1316,6 @@ const timeline = [];
 
 //Uncomment line below for RPP
 //timeline.push(opening_instructions);
-timeline.push(makePredictionTrials(speaker_5)); //group 2
 
 //Uncomment line below for prolific 
 timeline.push(opening_instructions_prolific);
