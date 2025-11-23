@@ -1206,6 +1206,7 @@ var opening_instructions_prolific = {
       <p>
         This study will probably take you less than ten minutes.
         Please do not rush. Your answers are very important research data.
+        You will listen to audio, so please turn up your volume.
       </p>
 
             <p style="margin-top: 20px;">
