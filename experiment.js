@@ -1206,7 +1206,6 @@ var opening_instructions_prolific = {
       <p>
         This study will probably take you less than ten minutes.
         Please do not rush. Your answers are very important research data.
-        You will listen to audio, so please turn up your volume.
       </p>
 
             <p style="margin-top: 20px;">
@@ -1276,8 +1275,46 @@ var prolific_id_page = {
       name: "prolific_id"
     }
   ],
-  button_label: "Submit"
+  button_label: "Submit",
+  on_finish: function(data) {
+    // Just save it straight into global properties
+    jsPsych.data.addProperties({
+      prolific_id: data.response.prolific_id
+    });
+  }
 };
+
+var prolific_completion_page = {
+  type: jsPsychHtmlKeyboardResponse,
+  choices: "NO_KEYS",  // they just read this and close the window
+  stimulus: `
+    <div style="
+      font-size: 24px;
+      line-height: 1.5;
+      color: black;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-top: 10%;
+      text-align: center;
+    ">
+      <p>Thank you for participating!</p>
+
+      <p style="margin-top: 20px;">
+        Your Prolific completion code is:
+      </p>
+
+      <p style="margin-top: 10px; font-size: 32px; font-weight: bold;">
+        <code>XXXXXXX</code>
+      </p>
+
+      <p style="margin-top: 30px;">
+        You can now return to Prolific and enter this code.<br>
+        When you are done, you may close this window.
+      </p>
+    </div>
+  `
+};
+
 
 
 var transition_configs = [{
@@ -1339,11 +1376,13 @@ timeline.push(makePredictionTrials(speaker_5)); //group 2
 //Uncomment for group 1 in the prediction phase
 //timeline.push(makePredictionTrials(speaker_6)); //group 2
 
+timeline.push(prolific_id_page);
 
 timeline.push(saving_screen);
 timeline.push(save_data);
 
-timeline.push(prolific_id_page);
+timeline.push(prolific_completion_page);
+
 //Uncomment for RPP
 //timeline.push(credit_instructions);
 
