@@ -1396,8 +1396,6 @@ if(condition == 1 || condition == 2 || condition == 3){
   timeline.push(makeGumballPages(configs_s1)); //group 1
   timeline.push(makeGumballPages(transition_configs));
   timeline.push(makeGumballPages(configs_s2)); // group 1 
-    timeline.push(makeGumballPages(transition_configs));
-  timeline.push(makeGumballPages(configs_s3)); // group 1 
 }
 
 //baseline
