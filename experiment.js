@@ -211,21 +211,14 @@ var gumball_configs_intro = [
       numRed: 0,
       numBlue: 0,
       specialAlien: 0,
-      headerText: "These green aliens live here.",
+      headerText: "These are the aliens who live there.",
       audio: null  // no audio on this one
     },
-        {
+    {
       numRed: 0,
       numBlue: 0,
       specialAlien: 0,
-      headerText: "These yellow aliens are visiting from another planet.",
-      audio: null  // no audio on this one
-    },
-     {
-      numRed: 0,
-      numBlue: 0,
-      specialAlien: 0,
-      headerText: "They are here for the annual gumball festival.",
+      headerText: "These aliens love gumballs.",
       audio: null  // no audio on this one
     },
       {
@@ -254,6 +247,17 @@ var gumball_configs_intro = [
       numBlue: 15,
       specialAlien: 1,
       headerText: "He says whether he thinks the aliens will get a blue gumball that day.",
+      audio: null  // no audio on this one
+    }
+  ]
+  
+  
+  var gumball_configs_intro_2 = [
+    {
+      numRed: 15,
+      numBlue: 15,
+      specialAlien: 0,
+      headerText: "Let's see what the first one says.",
       audio: null  // no audio on this one
     }
   ]
@@ -1096,7 +1100,7 @@ function makePredictionTrials(configList) {
 var save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "B6IasZcWqpCp",  // <-- paste from DataPipe
+  experiment_id: "0BsKbYzbB1AN",  // <-- paste from DataPipe
   filename: function() {
     // e.g., sub-ABCD1234_gumballs_2025-11-15-1700.csv
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -1316,7 +1320,7 @@ var prolific_completion_page = {
       </p>
 
       <p style="margin-top: 10px; font-size: 32px; font-weight: bold;">
-        <code>C2UKW0TN</code>
+        <code>C1FZ33BG</code>
       </p>
 
       <p style="margin-top: 30px;">
@@ -1362,17 +1366,14 @@ var pre_prediction_configs_2 = [{
 }]
 
 
-var speaker_same = makeSpeakerGumballConfigs(2, "female", .31, 3);
-//var speaker_2 = makeSpeakerGumballConfigs(3, "female", .41, 4);
-//var speaker_3= makeSpeakerGumballConfigs(1, "female", .41, 1);
-//var speaker_4= makeSpeakerGumballConfigs(4, "female", .41, 8);
+var speaker_same = makeSpeakerGumballConfigs(2, "male", .31, 2);
 var speaker_diff_group= makeSpeakerGumballConfigs(5, "male", .41, 7);
 var speaker_same_group= makeSpeakerGumballConfigs(5, "male", .41, 4);
 
-var configs_s1 = makeConditionConfigs("confident", "brian", "blue", 0.6, "male" ,2);
-var configs_s2 = makeConditionConfigs("confident", "river", "blue", 0.6, "female", 1);
-var configs_s3 = makeConditionConfigs("confident", "jessica", "blue", 0.6, "female", 3);
-var configs_s4 = makeConditionConfigs("confident", "bill", "blue", 0.65, "male", 7);
+
+var configs_s1 = makeConditionConfigs("cautious", "brian", "blue", 0.6, "male" ,2);
+var configs_s2 = makeConditionConfigs("cautious", "jessica", "blue", 0.6, "female", 3);
+var configs_s3 = makeConditionConfigs("cautious", "bill", "blue", 0.6, "male", 7);
 
 
 // Assign to one condition
@@ -1401,8 +1402,6 @@ timeline.push(makeGumballPages(gumball_configs_intro));
 if(condition == 1 || condition == 2 || condition == 3){
   timeline.push(makeGumballPages(gumball_configs_intro_2));
   timeline.push(makeGumballPages(configs_s1)); //group 1
-  timeline.push(makeGumballPages(transition_configs));
-  timeline.push(makeGumballPages(configs_s2)); // group 1 
 }
 
 //baseline
@@ -1423,7 +1422,7 @@ if (condition === 2) {
   timeline.push(makePredictionTrials(speaker_same_group));
 }
 
-
+//exposure speaker
 if (condition ===3){
   timeline.push(makeGumballPages(pre_prediction_configs_1));
   timeline.push(makeGumballPages(pre_prediction_configs_2));
