@@ -1100,7 +1100,7 @@ function makePredictionTrials(configList) {
 var save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "0BsKbYzbB1AN",  // <-- paste from DataPipe
+  experiment_id: "bNre3w210q48",  // <-- paste from DataPipe
   filename: function() {
     // e.g., sub-ABCD1234_gumballs_2025-11-15-1700.csv
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
