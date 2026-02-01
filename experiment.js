@@ -256,18 +256,7 @@ var gumball_configs_intro = [
     {
       numRed: 15,
       numBlue: 15,
-      specialAlien: 0,
-      headerText: "Let's see what the first one says.",
-      audio: null  // no audio on this one
-    }
-  ]
-  
-  
-  var gumball_configs_intro_2 = [
-    {
-      numRed: 15,
-      numBlue: 15,
-      specialAlien: 0,
+      specialAlien: 1,
       headerText: "Let's see what the first one says.",
       audio: null  // no audio on this one
     }
@@ -316,26 +305,16 @@ function makeSpeakerGumballConfigs(speakerNumber, gender, threshold, specialAlie
     pronounPhrase = "He says";
   } 
 
-  // Text templates using that pronoun
-  const someText = `${pronounPhrase}, "Oooh, some of them are blue."`;
-  const manyText = `${pronounPhrase}, "Oooh, many of them are blue."`;
-
-  // Audio paths for this speaker (assuming your existing structure)
-  const someAudioPath = `audio/${speakerNumber}/some.mp3`;
-  const manyAudioPath = `audio/${speakerNumber}/many.mp3`;
 
   // Build configs for this speaker
   const configs = baseRatios.map(r => {
     const total = r.numRed + r.numBlue;
     const propBlue = r.numBlue / total;
-    const useMany = propBlue >= threshold;
 
     return {
       numRed: r.numRed,
       numBlue: r.numBlue,
       specialAlien: r.specialAlien,
-      headerText: useMany ? manyText : someText,
-      audio: useMany ? manyAudioPath : someAudioPath,
 
       // nice to have in data:
       proportionBlue: propBlue,
@@ -706,7 +685,7 @@ function makeGumballPages(configList) {
 
   // Start with button disabled
   // Uncomment this for real thing
-  disableNextButton();
+  //disableNextButton();
 
   if (audioFile) {
     window.currentExposureAudio = new Audio(audioFile);
@@ -1095,12 +1074,245 @@ function makePredictionTrials(configList) {
   };
 }
 
+// Jumping Intro Section
+
+// ---------------------
+// ALIEN INTRO (ROLL CALL)
+// ---------------------
+
+// speakerNumber is a STRING (folder name under /audio)
+const GREEN_SPEAKER = {
+  1: "brian",
+  2: "jessica",
+  3: "liam",
+  4: "river"
+};
+
+const YELLOW_SPEAKER = {
+  1: "bill",
+  2: "sarah",
+  3: "will",
+  4: "matilda"
+};
+
+
+function buildAlienRollCall({ greenWord, yellowWord }) {
+  const greenIdxs = [1,2,3,4];
+  const yellowIdxs = [1,2,3,4];
+
+  const green = greenIdxs.map(idx => {
+    const speakerNumber = GREEN_SPEAKER[idx]; // string
+    return {
+      color: "green",
+      idx,
+      speakerNumber,
+      audio: `audio/${speakerNumber}/${greenWord}.mp3`
+    };
+  });
+
+  const yellow = yellowIdxs.map(idx => {
+    const speakerNumber = YELLOW_SPEAKER[idx]; // string
+    return {
+      color: "yellow",
+      idx,
+      speakerNumber,
+      audio: `audio/${speakerNumber}/${yellowWord}.mp3`
+    };
+  });
+
+  return green.concat(yellow);
+}
+
+
+
+// Global styles for alien jump (run once)
+const alienJumpStyle = document.createElement("style");
+alienJumpStyle.id = "alien-jump-style";
+alienJumpStyle.innerHTML = `
+  @keyframes alienJump {
+    0% {
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(-42px);  /* ← higher jump */
+    }
+    50% {
+      transform: translateY(-48px);  /* ← gentle hang time at top */
+    }
+    75% {
+      transform: translateY(-42px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  .alien-jump {
+    animation: alienJump 700ms ease-in-out infinite;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
+  }
+`;
+document.head.appendChild(alienJumpStyle);
+
+
+
+function makeAlienRollCall(configList) {
+  return {
+    timeline: [
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: "NO_KEYS",
+
+        data: function() {
+          return {
+            block_type: "alien_intro",
+            alien_color: jsPsych.timelineVariable("color"),
+            alien_idx: jsPsych.timelineVariable("idx"),
+            alien_speaker: jsPsych.timelineVariable("speaker"),
+            alien_audio: jsPsych.timelineVariable("audio")
+          };
+        },
+
+        stimulus: function() {
+          const color = jsPsych.timelineVariable("color");
+          const idx   = jsPsych.timelineVariable("idx");
+
+          const leftAliensHTML = [1,2,3,4].map(i => {
+            const jumpClass = (color === "green" && idx === i) ? "alien-jump" : "";
+            return `
+              <img src="images/aliens/alien_green_${i}.png"
+                   class="${jumpClass}"
+                   style="height:20vh; object-fit:contain;">
+            `;
+          }).join("");
+
+          const rightAliensHTML = [1,2,3,4].map(i => {
+            const jumpClass = (color === "yellow" && idx === i) ? "alien-jump" : "";
+            return `
+              <img src="images/aliens/alien_yellow_${i}.png"
+                   class="${jumpClass}"
+                   style="height:16vh; object-fit:contain;">
+            `;
+          }).join("");
+
+          // gumballs in the globe during roll call
+          const gumballsHTML = makeGumballsHTML(15, 15);
+
+          return `
+            <div style="position:relative; width:100vw; height:100vh; overflow:hidden;">
+              <img src="images/background.png"
+                   style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+
+              <div style="
+                position:absolute; top:8%; width:100%; text-align:center;
+                font-size:3vw; color:white;
+                text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+                z-index:2;">
+                These aliens like gumballs.
+              </div>
+
+              <div style="
+                position:absolute;
+                bottom:24%;
+                left:50%;
+                transform:translateX(-50%);
+                width:80vw;
+                display:grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items:flex-end;
+                column-gap:1vw;
+                z-index:2;
+              ">
+                <div style="display:flex; justify-content:flex-end; align-items:flex-end; gap:0.8vw;">
+                  ${leftAliensHTML}
+                </div>
+
+                <div style="position:relative; height:50vh; display:flex; align-items:flex-end; justify-content:center;">
+                  <img src="images/gumball_machine_empty.png"
+                       style="height:100%; object-fit:contain; display:block;">
+
+                  <div id="gumball-globe" style="
+                    position:absolute;
+                    top:13%;
+                    left:18%;
+                    width:64%;
+                    height:41%;
+                    background:white;
+                    border-radius:50%;
+                    overflow:hidden;
+                    z-index:10;
+                  ">
+                    ${gumballsHTML}
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-start; align-items:flex-end; gap:0.8vw;">
+                  ${rightAliensHTML}
+                </div>
+              </div>
+
+              <div style="position:absolute; bottom:5%; width:100%; display:flex; justify-content:center; z-index:5;">
+                <button id="nextButton"
+                        style="font-size:30px; padding:12px 28px; border-radius:14px; cursor:not-allowed; opacity:0.5;"
+                        disabled>
+                  Next ➡
+                </button>
+              </div>
+            </div>
+          `;
+        },
+
+        on_load: function() {
+          const nextBtn = document.getElementById("nextButton");
+          const audioFile = jsPsych.timelineVariable("audio");
+
+          function enableNext() {
+            nextBtn.disabled = false;
+            nextBtn.style.cursor = "pointer";
+            nextBtn.style.opacity = "1";
+          }
+
+          nextBtn.onclick = () => {
+            if (nextBtn.disabled) return;
+            jsPsych.finishTrial();
+          };
+
+          // animate gumballs on roll call
+          startGumballAnimation('#gumball-globe');
+
+          if (audioFile) {
+            window.currentIntroAudio = new Audio(audioFile);
+            window.currentIntroAudio.addEventListener("ended", enableNext);
+            window.currentIntroAudio.play().catch(e => {
+              console.warn("Intro audio blocked/failed:", e);
+              enableNext();
+            });
+          } else {
+            enableNext();
+          }
+        },
+
+        on_finish: function() {
+          if (window.currentIntroAudio) {
+            window.currentIntroAudio.pause();
+            window.currentIntroAudio = null;
+          }
+
+          // stop animation
+          stopGumballAnimation('#gumball-globe');
+        }
+      }
+    ],
+
+    timeline_variables: configList
+  };
+}
+
 
 
 var save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "bNre3w210q48",  // <-- paste from DataPipe
+  experiment_id: "rPHJMpaLUQnK",  // <-- paste from DataPipe
   filename: function() {
     // e.g., sub-ABCD1234_gumballs_2025-11-15-1700.csv
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -1175,7 +1387,7 @@ var opening_instructions = {
     ">
 
       <p>
-        This study will probably take you less than ten minutes.
+        This study will probably take you less than fifteen minutes.
         Please do not rush. Your answers are very important research data.
       </p>
 
@@ -1320,7 +1532,7 @@ var prolific_completion_page = {
       </p>
 
       <p style="margin-top: 10px; font-size: 32px; font-weight: bold;">
-        <code>C4LMH6MP</code>
+        <code>C2UKW0TN</code>
       </p>
 
       <p style="margin-top: 30px;">
@@ -1366,20 +1578,58 @@ var pre_prediction_configs_2 = [{
 }]
 
 
-var speaker_same = makeSpeakerGumballConfigs(2, "male", .31, 2);
-var speaker_diff_group= makeSpeakerGumballConfigs(5, "male", .41, 7);
-var speaker_same_group= makeSpeakerGumballConfigs(5, "male", .41, 4);
-
-
-var configs_s1 = makeConditionConfigs("cautious", "brian", "blue", 0.6, "male" ,2);
-var configs_s2 = makeConditionConfigs("cautious", "jessica", "blue", 0.6, "female", 3);
-var configs_s3 = makeConditionConfigs("cautious", "bill", "blue", 0.6, "male", 7);
-
 
 // Assign to one condition
 
-var condition = jsPsych.randomization.sampleWithoutReplacement([1,2,3], 1)[0];
+var condition = jsPsych.randomization.sampleWithoutReplacement([1,2], 1)[0];
 jsPsych.data.addProperties({ prediction_condition: condition });
+
+var speaker_con = jsPsych.randomization.sampleWithoutReplacement([0,1], 1)[0];
+jsPsych.data.addProperties({ speaker_condition: speaker_con });
+
+
+//(speakerNumber, gender, threshold, specialAlien)
+var speaker_same = makeSpeakerGumballConfigs("jessica", "female", .31, 2);
+var speaker_same_group= makeSpeakerGumballConfigs("liam", "male", .41, 3);
+var speaker_diff_group= makeSpeakerGumballConfigs("will", "male", .41, 7);
+
+
+if(speaker_con == 0){
+  var bias = "cautious"
+}else{
+  var bias = "confident"
+}
+
+
+var lexical_balance = jsPsych.randomization.sampleWithoutReplacement([0,1], 1)[0];
+jsPsych.data.addProperties({ lexical_balance: lexical_balance });
+
+// lexical_balance == 0: green says sweets, yellow says candy
+// lexical_balance == 1: green says candy,  yellow says sweets
+const greenWord  = (lexical_balance === 0) ? "sweets" : "candy";
+const yellowWord = (lexical_balance === 0) ? "candy"  : "sweets";
+
+const ALIEN_ROLLCALL = buildAlienRollCall({ greenWord, yellowWord });
+
+// Speaker audio position
+
+//green
+ // 1: "brian",
+ // 2: "jessica",
+// 3: "liam",
+//  4: "river"
+
+// yellow
+//  5: "bill",
+//  6: "sarah",
+//  7: "will",
+//  8: "matilda"
+
+
+//(condition, speakerNumber, target="blue", speakerThreshold=0.60, gender = "male", specialAlien)
+var configs_s1 = makeConditionConfigs(bias, "brian", "blue", 0.6, "male" ,1);
+var configs_s2 = makeConditionConfigs(bias, "jessica", "blue", 0.6, "female", 2);
+
 
 
 // ---------------------
@@ -1388,20 +1638,29 @@ jsPsych.data.addProperties({ prediction_condition: condition });
 const timeline = [];
 
 console.log(condition);
+console.log(speaker_con);
+console.log(lexical_balance);
+
+
 //Uncomment line below for RPP
 //timeline.push(opening_instructions);
 
 //Uncomment lines below for prolific 
-timeline.push(prolific_id_page);
-timeline.push(opening_instructions_prolific);
+//timeline.push(prolific_id_page);
+//timeline.push(opening_instructions_prolific);
 
-timeline.push(consent_block);
 
-timeline.push(makeGumballPages(gumball_configs_intro));
+
+//timeline.push(consent_block);
+
+timeline.push(makeGumballPages(gumball_configs_intro_p1));
+timeline.push(makeGumballPages(gumball_configs_intro_p2));
 
 if(condition == 1 || condition == 2 || condition == 3){
   timeline.push(makeGumballPages(gumball_configs_intro_2));
   timeline.push(makeGumballPages(configs_s1)); //group 1
+  timeline.push(makeGumballPages(transition_configs));
+  timeline.push(makeGumballPages(configs_s2)); // group 1 
 }
 
 //baseline
@@ -1418,11 +1677,11 @@ if (condition === 1) {
 
 //new green speaker
 if (condition === 2) {
-  timeline.push(makeGumballPages(pre_prediction_configs));
+  timeline.push(makeGumballPages(pre_prediction_configs)); 
   timeline.push(makePredictionTrials(speaker_same_group));
 }
 
-//exposure speaker
+
 if (condition ===3){
   timeline.push(makeGumballPages(pre_prediction_configs_1));
   timeline.push(makeGumballPages(pre_prediction_configs_2));
@@ -1432,10 +1691,10 @@ if (condition ===3){
 timeline.push(saving_screen);
 timeline.push(save_data);
 
-timeline.push(prolific_completion_page);
+//timeline.push(prolific_completion_page);
 
 //Uncomment for RPP
-//timeline.push(credit_instructions);
+timeline.push(credit_instructions);
 
 
 // ---------------------
